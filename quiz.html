@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desafío: Niveles Organizacionales</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #0f0e17;
+            --surface: #1a1928;
+            --surface2: #232236;
+            --accent: #f6c90e;
+            --accent2: #ff6b6b;
+            --accent3: #4ecdc4;
+            --text: #fffffe;
+            --muted: #94a3b8;
+            --correct: #22c55e;
+            --wrong: #ef4444;
+            --radius: 16px;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse 80% 50% at 20% 10%, rgba(246,201,14,0.08) 0%, transparent 60%),
+                        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(78,205,196,0.07) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        #app {
+            width: 100%;
+            max-width: 700px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ── SCREENS ── */
+        .screen { display: none; animation: fadeIn 0.4s ease; }
+        .screen.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ── CARD ── */
+        .card {
+            background: var(--surface);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #1e1c34 0%, #16152a 100%);
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+
+        .card-header p { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+        .card-body { padding: 2rem; }
+
+        /* ── REGISTRATION SCREEN ── */
+        .reg-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+        .reg-title span { color: var(--accent); }
+        .reg-sub { color: var(--muted); margin-bottom: 2rem; font-size: 0.9rem; }
+
+        .input-row {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+        .input-row input {
+            flex: 1;
+            padding: 0.9rem 1.2rem;
+            background: var(--surface2);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .input-row input:focus { border-color: var(--accent); }
+        .input-row input::placeholder { color: var(--muted); }
+
+        .teams-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-bottom: 1.5rem;
+            min-height: 44px;
+        }
+        .team-tag {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--surface2);
+            border: 1px solid rgba(246,201,14,0.3);
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            animation: popIn 0.2s ease;
+        }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .team-tag .remove {
+            cursor: pointer;
+            color: var(--muted);
+            font-size: 1rem;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+        .team-tag .remove:hover { color: var(--accent2); }
+
+        .team-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        /* ── BUTTONS ── */
+        .btn {
+            padding: 0.85rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.18s;
+            white-space: nowrap;
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn-accent { background: var(--accent); color: #0f0e17; }
+        .btn-accent:hover { background: #ffd93d; }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.15);
+            color: var(--text);
+        }
+        .btn-outline:hover { border-color: rgba(255,255,255,0.4); }
+        .btn-success { background: var(--correct); color: #fff; }
+        .btn-success:hover { background: #16a34a; }
+        .btn-danger { background: var(--wrong); color: #fff; }
+        .btn-full { width: 100%; }
+        .btn-sm { padding: 0.6rem 1rem; font-size: 0.85rem; }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+        /* ── GAME HEADER ── */
+        .game-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .q-counter {
+            font-family: 'Syne', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+        .timer-wrap { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+        .timer-label { font-size: 0.75rem; color: var(--muted); }
+        .timer-num {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--accent);
+            transition: color 0.3s;
+        }
+        .timer-num.danger { color: var(--accent2); }
+
+        .progress-bar-wrap { background: rgba(255,255,255,0.07); height: 4px; }
+        .progress-bar { height: 4px; background: var(--accent); transition: width 1s linear; }
+        .progress-bar.danger { background: var(--accent2); }
+
+        /* ── QUESTION ── */
+        .question-text {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-bottom: 1.5rem;
+        }
+
+        .options-grid { display: flex; flex-direction: column; gap: 0.75rem; }
+
+        .opt-btn {
+            text-align: left;
+            padding: 1rem 1.25rem;
+            background: var(--surface2);
+            border: 2px solid rgba(255,255,255,0.08);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.18s;
+        }
+        .opt-btn:hover:not(:disabled) { border-color: var(--accent); background: rgba(246,201,14,0.08); }
+        .opt-btn:disabled { cursor: not-allowed; }
+        .opt-btn.correct { border-color: var(--correct); background: rgba(34,197,94,0.15); }
+        .opt-btn.wrong { border-color: var(--wrong); background: rgba(239,68,68,0.12); }
+
+        /* ── DRAG/DROP ── */
+        .drop-zone {
+            min-height: 80px;
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            margin-bottom: 1.25rem;
+        }
+        .drop-zone.dragover { border-color: var(--accent); background: rgba(246,201,14,0.05); }
+
+        .drag-items { display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: center; }
+        .drag-chip {
+            padding: 0.65rem 1rem;
+            background: var(--surface2);
+            border: 2px solid rgba(78,205,196,0.4);
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 0.88rem;
+            cursor: grab;
+            user-select: none;
+            transition: all 0.15s;
+        }
+        .drag-chip:hover { border-color: var(--accent3); background: rgba(78,205,196,0.1); }
+        .drag-chip:active { cursor: grabbing; }
+
+        .sort-item {
+            padding: 1rem 1.25rem;
+            background: var(--surface2);
+            border: 2px solid rgba(255,255,255,0.08);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: grab;
+            user-select: none;
+            transition: all 0.15s;
+        }
+        .sort-item:hover { border-color: rgba(246,201,14,0.4); }
+        .sort-handle { color: var(--muted); font-size: 1.1rem; }
+
+        /* ── FEEDBACK BANNER ── */
+        #feedback {
+            padding: 1rem 1.5rem;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.95rem;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+        #feedback.show { display: flex; }
+        #feedback.correct-fb { background: rgba(34,197,94,0.15); color: #86efac; }
+        #feedback.wrong-fb { background: rgba(239,68,68,0.12); color: #fca5a5; }
+
+        /* ── TEAM SCORER ── */
+        #team-scorer {
+            padding: 1.25rem 2rem;
+            background: var(--surface2);
+            border-top: 1px solid rgba(255,255,255,0.06);
+            display: none;
+        }
+        #team-scorer.show { display: block; }
+        #team-scorer h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            margin-bottom: 0.75rem;
+        }
+        .team-btns { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+        .team-score-btn {
+            padding: 0.6rem 1.1rem;
+            border-radius: 100px;
+            border: 2px solid;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.18s;
+        }
+        .team-score-btn:hover { filter: brightness(1.2); transform: scale(1.04); }
+        .team-score-btn:active { transform: scale(0.97); }
+
+        /* ── CONTROLS ── */
+        #controls {
+            padding: 1.25rem 2rem;
+            background: rgba(0,0,0,0.2);
+            border-top: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* ── LEADERBOARD ── */
+        .lb-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 0.25rem;
+        }
+        .lb-sub { text-align: center; color: var(--muted); margin-bottom: 2rem; font-size: 0.9rem; }
+
+        .lb-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            background: var(--surface2);
+            border-radius: var(--radius);
+            margin-bottom: 0.75rem;
+            border: 1px solid rgba(255,255,255,0.06);
+            animation: slideIn 0.3s ease both;
+        }
+        .lb-row:nth-child(1) { border-color: rgba(246,201,14,0.4); }
+        .lb-row:nth-child(2) { border-color: rgba(192,192,192,0.3); }
+        .lb-row:nth-child(3) { border-color: rgba(205,127,50,0.3); }
+
+        @keyframes slideIn { from { opacity:0; transform: translateX(-16px); } to { opacity:1; transform: translateX(0); } }
+        .lb-rank {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            width: 36px;
+            text-align: center;
+        }
+        .lb-rank.gold { color: var(--accent); }
+        .lb-rank.silver { color: #c0c0c0; }
+        .lb-rank.bronze { color: #cd7f32; }
+
+        .lb-name { flex: 1; font-weight: 600; font-size: 1rem; }
+        .lb-score {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--accent);
+        }
+        .lb-pts { font-size: 0.75rem; color: var(--muted); }
+
+        .lb-bar-wrap { flex: 1; background: rgba(255,255,255,0.06); border-radius: 4px; height: 6px; }
+        .lb-bar { height: 6px; border-radius: 4px; background: var(--accent); transition: width 0.8s ease; }
+
+        /* ── LIVE SCOREBOARD MINI ── */
+        #live-scores {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 0.75rem 2rem;
+            background: rgba(0,0,0,0.15);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .live-score-chip {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.3rem 0.75rem;
+            background: var(--surface2);
+            border-radius: 100px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .live-score-chip .pts {
+            font-family: 'Syne', sans-serif;
+            color: var(--accent);
+            font-size: 0.9rem;
+        }
+
+        /* ── INTRO ── */
+        .intro-body { padding: 3rem 2rem; text-align: center; }
+        .intro-body h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+        }
+        .intro-body p { color: var(--muted); max-width: 360px; margin: 0 auto; line-height: 1.6; }
+
+        .teams-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+        .team-preview-chip {
+            display: flex; align-items: center; gap: 0.4rem;
+            padding: 0.5rem 1rem;
+            background: var(--surface2);
+            border-radius: 100px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .rules-list {
+            text-align: left;
+            max-width: 320px;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .rules-list li {
+            list-style: none;
+            font-size: 0.88rem;
+            color: var(--muted);
+            padding: 0.4rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .rules-list li span { color: var(--accent); font-weight: 700; }
+
+        /* ── SHAKE ── */
+        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97); }
+        @keyframes shake {
+            10%,90%{transform:translate3d(-2px,0,0)}
+            20%,80%{transform:translate3d(3px,0,0)}
+            30%,50%,70%{transform:translate3d(-5px,0,0)}
+            40%,60%{transform:translate3d(5px,0,0)}
+        }
+
+        /* ── POINT TOAST ── */
+        .point-toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: var(--correct);
+            color: #fff;
+            font-family: 'Syne', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            padding: 1.5rem 3rem;
+            border-radius: 24px;
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            animation: toastAnim 1.2s ease forwards;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        @keyframes toastAnim {
+            0%  { opacity:0; transform:translate(-50%,-50%) scale(0.7); }
+            20% { opacity:1; transform:translate(-50%,-50%) scale(1.05); }
+            70% { opacity:1; transform:translate(-50%,-50%) scale(1); }
+            100%{ opacity:0; transform:translate(-50%,-70%) scale(0.9); }
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+
+    <!-- ═══════════════ SCREEN: REGISTRATION ═══════════════ -->
+    <div id="screen-reg" class="screen active">
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h1>Comportamiento Organizacional</h1>
+    
+                </div>
+            </div>
+            <div class="card-body">
+                <h2 class="reg-title">Registro de <span>Equipos</span></h2>
+
+
+                <div class="input-row">
+                    <input type="text" id="team-input" placeholder="Nombre del equipo…" maxlength="30" />
+                    <button class="btn btn-accent" id="add-team-btn">Añadir</button>
+                </div>
+
+                <div id="teams-list" class="teams-list">
+                    <span style="color:var(--muted);font-size:0.85rem;align-self:center;">Aún no hay equipos…</span>
+                </div>
+
+                <button class="btn btn-success btn-full" id="go-game-btn" disabled>
+                    ▶ Ir al juego
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ SCREEN: INTRO ═══════════════ -->
+    <div id="screen-intro" class="screen">
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h1>Comportamiento Organizacional</h1>
+                    <p>Tema: Los Niveles Jerárquicos</p>
+                </div>
+            </div>
+            <div class="intro-body">
+                <h2>¿Listos para<br>el desafío?</h2>
+                <div id="teams-preview-wrap" class="teams-preview"></div>
+                <ul class="rules-list">
+                    <li>⏱ <span>20s</span> por pregunta antes de que el tiempo expire</li>
+                    <li>🥇 Primer intento correcto: <span>10 pts</span></li>
+                    <li>🔄 Intentos siguientes: <span>5 pts</span></li>
+                    <li>👆 Selecciona el equipo que respondió bien</li>
+                </ul>
+                <button class="btn btn-accent" style="padding:1rem 2.5rem;font-size:1.05rem;" id="start-btn">
+                    ¡COMENZAR!
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ SCREEN: GAME ═══════════════ -->
+    <div id="screen-game" class="screen">
+        <div class="card">
+            <!-- Header -->
+            <div class="card-header">
+                <div class="game-meta" style="width:100%;">
+                    <div>
+                        <h1 style="font-size:0.85rem;">Niveles Jerárquicos</h1>
+                        <p id="q-counter" class="q-counter" style="color:var(--text);margin-top:2px;">Pregunta 1 / 10</p>
+                    </div>
+                    <div class="timer-wrap">
+                        <span class="timer-label">Tiempo restante</span>
+                        <span id="timer-num" class="timer-num">20</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timer bar -->
+            <div class="progress-bar-wrap">
+                <div id="timer-bar" class="progress-bar" style="width:100%"></div>
+            </div>
+
+            <!-- Live mini scores -->
+            <div id="live-scores"></div>
+
+            <!-- Question body -->
+            <div id="q-content" class="card-body" style="min-height:320px;">
+            </div>
+
+            <!-- Feedback -->
+            <div id="feedback"></div>
+
+            <!-- Team scorer (shown after correct) -->
+            <div id="team-scorer">
+                <h3 id="scorer-label">¿Qué equipo respondió correctamente?</h3>
+                <div id="team-btns" class="team-btns"></div>
+            </div>
+
+            <!-- Controls -->
+            <div id="controls">
+                <button id="next-btn" class="btn btn-accent hidden">Siguiente pregunta →</button>
+                <button id="retry-btn" class="btn btn-outline hidden">Reintentar <span id="retry-countdown"></span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ SCREEN: LEADERBOARD ═══════════════ -->
+    <div id="screen-lb" class="screen">
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h1>Comportamiento Organizacional</h1>
+                    <p>Resultados finales</p>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="lb-title">🏆 Tablero Final</div>
+                <p class="lb-sub">Puntuaciones acumuladas del grupo</p>
+                <div id="lb-list"></div>
+                <button class="btn btn-accent btn-full" style="margin-top:1rem;" onclick="location.reload()">
+                    Nueva sesión
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+// ─── PALETTE FOR TEAMS ────────────────────────────────────────────────────────
+const TEAM_COLORS = [
+    { bg: '#f6c90e', text: '#0f0e17' },
+    { bg: '#ff6b6b', text: '#fff' },
+    { bg: '#4ecdc4', text: '#0f0e17' },
+    { bg: '#a78bfa', text: '#fff' },
+    { bg: '#fb923c', text: '#fff' },
+    { bg: '#34d399', text: '#0f0e17' },
+    { bg: '#60a5fa', text: '#0f0e17' },
+    { bg: '#f472b6', text: '#fff' },
+];
+
+// ─── QUESTIONS ────────────────────────────────────────────────────────────────
+const questions = [
+    { type:'sort', question:'Ordena la pirámide organizacional desde el nivel más alto al más bajo:', items:['Nivel Estratégico','Nivel Táctico','Nivel Operativo'], correct:['Nivel Estratégico','Nivel Táctico','Nivel Operativo'] },
+    { type:'choice', question:'¿Cuál es el horizonte de tiempo predominante en el Nivel Estratégico?', options:['Corto plazo (meses)','Mediano plazo (1 año)','Largo plazo (3 a 5 años)','Inmediato'], correct:2 },
+    { type:'match', question:'Arrastra la función al Nivel Superior (Estratégico):', dragItems:['Análisis FODA','Supervisión de obreros','Informes de ventas diarios'], target:'Análisis FODA' },
+    { type:'choice', question:'¿Quién actúa como intermediario entre la dirección y el nivel operativo?', options:['Director Ejecutivo','Gerencia de Nivel Medio','Nivel Inferior','Accionistas'], correct:1 },
+    { type:'boolean', question:'¿El modelo burocrático de Max Weber se basa en la diferenciación de poder y jerarquía?', options:['Verdadero','Falso'], correct:0 },
+    { type:'match', question:'Arrastra la función al Nivel Operativo:', dragItems:['Gestión del cambio','Priorizar tareas diarias','Establecer visión 2030'], target:'Priorizar tareas diarias' },
+    { type:'choice', question:'¿Qué nivel se ocupa de la ejecución de procesos y objetivos de corto plazo?', options:['Nivel Táctico','Nivel Estratégico','Nivel Operativo','Nivel Global'], correct:2 },
+    { type:'sort', question:'Ordena estos cargos de mayor a menor autoridad:', items:['Director Ejecutivo','Gerente de Departamento','Supervisor de Turno'], correct:['Director Ejecutivo','Gerente de Departamento','Supervisor de Turno'] },
+    { type:'choice', question:'¿Cuál es una función clave de los ejecutivos de nivel Táctico?', options:['Diseñar la visión de mercado','Operar maquinaria pesada','Definir indicadores de desempeño colectivo','Aceptar críticas de clientes'], correct:2 },
+    { type:'boolean', question:'¿El nivel estratégico se encarga de las actividades cotidianas de la empresa?', options:['Verdadero','Falso'], correct:1 },
+];
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let teams = [];          // { name, color }
+let scores = {};         // { name: points }
+let qIdx = 0;
+let isFirstAttempt = true;
+let canAnswer = true;
+let timeLeft = 20;
+let timer, retryTimer;
+let scorerOpen = false;
+
+// ─── ELEMENTS ─────────────────────────────────────────────────────────────────
+const screens = { reg: document.getElementById('screen-reg'), intro: document.getElementById('screen-intro'), game: document.getElementById('screen-game'), lb: document.getElementById('screen-lb') };
+const teamInput = document.getElementById('team-input');
+const addTeamBtn = document.getElementById('add-team-btn');
+const teamsList = document.getElementById('teams-list');
+const goGameBtn = document.getElementById('go-game-btn');
+const startBtn = document.getElementById('start-btn');
+const qContent = document.getElementById('q-content');
+const feedbackEl = document.getElementById('feedback');
+const teamScorer = document.getElementById('team-scorer');
+const scorerLabel = document.getElementById('scorer-label');
+const teamBtns = document.getElementById('team-btns');
+const nextBtn = document.getElementById('next-btn');
+const retryBtn = document.getElementById('retry-btn');
+const retryCountdown = document.getElementById('retry-countdown');
+const timerNum = document.getElementById('timer-num');
+const timerBar = document.getElementById('timer-bar');
+const qCounter = document.getElementById('q-counter');
+const liveScores = document.getElementById('live-scores');
+
+// ─── SCREEN SWITCH ─────────────────────────────────────────────────────────────
+function showScreen(name) {
+    Object.values(screens).forEach(s => s.classList.remove('active'));
+    screens[name].classList.add('active');
+}
+
+// ─── REGISTRATION ─────────────────────────────────────────────────────────────
+function renderTeamsList() {
+    if (teams.length === 0) {
+        teamsList.innerHTML = '<span style="color:var(--muted);font-size:0.85rem;align-self:center;">Aún no hay equipos…</span>';
+        goGameBtn.disabled = true;
+        return;
+    }
+    teamsList.innerHTML = '';
+    teams.forEach((t, i) => {
+        const tag = document.createElement('div');
+        tag.className = 'team-tag';
+        tag.innerHTML = `<span class="team-dot" style="background:${t.color.bg}"></span>${t.name}<span class="remove" data-i="${i}">✕</span>`;
+        teamsList.appendChild(tag);
+    });
+    goGameBtn.disabled = teams.length < 2;
+    if (teams.length === 1) goGameBtn.disabled = true;
+}
+
+function addTeam() {
+    const name = teamInput.value.trim();
+    if (!name) return;
+    if (teams.find(t => t.name.toLowerCase() === name.toLowerCase())) {
+        teamInput.style.borderColor = 'var(--wrong)';
+        setTimeout(() => teamInput.style.borderColor = '', 1000);
+        return;
+    }
+    const color = TEAM_COLORS[teams.length % TEAM_COLORS.length];
+    teams.push({ name, color });
+    scores[name] = 0;
+    teamInput.value = '';
+    teamInput.focus();
+    renderTeamsList();
+}
+
+addTeamBtn.onclick = addTeam;
+teamInput.onkeydown = e => { if (e.key === 'Enter') addTeam(); };
+teamsList.onclick = e => {
+    const i = e.target.dataset.i;
+    if (i !== undefined) {
+        const name = teams[i].name;
+        delete scores[name];
+        teams.splice(i, 1);
+        renderTeamsList();
+    }
+};
+
+goGameBtn.onclick = () => {
+    // Populate intro preview
+    const wrap = document.getElementById('teams-preview-wrap');
+    wrap.innerHTML = '';
+    teams.forEach(t => {
+        const chip = document.createElement('div');
+        chip.className = 'team-preview-chip';
+        chip.innerHTML = `<span class="team-dot" style="background:${t.color.bg}"></span>${t.name}`;
+        wrap.appendChild(chip);
+    });
+    showScreen('intro');
+};
+
+startBtn.onclick = () => {
+    qIdx = 0;
+    teams.forEach(t => { scores[t.name] = 0; });
+    showScreen('game');
+    loadQuestion();
+};
+
+// ─── LIVE SCOREBOARD ─────────────────────────────────────────────────────────
+function renderLiveScores() {
+    liveScores.innerHTML = '';
+    teams.forEach(t => {
+        const chip = document.createElement('div');
+        chip.className = 'live-score-chip';
+        chip.innerHTML = `<span class="team-dot" style="background:${t.color.bg}"></span>${t.name}<span class="pts">${scores[t.name]}</span>`;
+        liveScores.appendChild(chip);
+    });
+}
+
+// ─── GAME LOOP ─────────────────────────────────────────────────────────────────
+function loadQuestion() {
+    isFirstAttempt = true;
+    canAnswer = true;
+    timeLeft = 20;
+    scorerOpen = false;
+
+    feedbackEl.className = '';
+    feedbackEl.innerHTML = '';
+    teamScorer.classList.remove('show');
+    nextBtn.classList.add('hidden');
+    retryBtn.classList.add('hidden');
+    retryCountdown.innerText = '';
+
+    qCounter.innerText = `Pregunta ${qIdx + 1} / ${questions.length}`;
+    renderLiveScores();
+    renderQuestion(questions[qIdx]);
+    startTimer();
+}
+
+function startTimer() {
+    clearInterval(timer);
+    updateTimerDisplay();
+    timer = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+        if (timeLeft <= 0) { clearInterval(timer); handleTimeout(); }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    timerNum.innerText = timeLeft;
+    timerBar.style.width = `${(timeLeft / 20) * 100}%`;
+    const danger = timeLeft <= 5;
+    timerNum.classList.toggle('danger', danger);
+    timerBar.classList.toggle('danger', danger);
+}
+
+// ─── RENDER QUESTION ─────────────────────────────────────────────────────────
+function renderQuestion(q) {
+    qContent.innerHTML = `<p class="question-text">${q.question}</p>`;
+    const wrap = document.createElement('div');
+
+    if (q.type === 'choice' || q.type === 'boolean') {
+        wrap.className = 'options-grid';
+        q.options.forEach((opt, i) => {
+            const b = document.createElement('button');
+            b.className = 'opt-btn';
+            b.innerText = opt;
+            b.onclick = () => checkAnswer(i);
+            wrap.appendChild(b);
+        });
+    } else if (q.type === 'sort') {
+        wrap.className = 'options-grid';
+        const shuffled = [...q.items].sort(() => Math.random() - 0.5);
+        shuffled.forEach(item => {
+            const d = document.createElement('div');
+            d.className = 'sort-item';
+            d.draggable = true;
+            d.dataset.value = item;
+            d.innerHTML = `<span>${item}</span><span class="sort-handle">⠿</span>`;
+            d.addEventListener('dragstart', dragStart);
+            d.addEventListener('dragover', dragOver);
+            d.addEventListener('drop', dragDrop);
+            wrap.appendChild(d);
+        });
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-accent btn-full';
+        btn.style.marginTop = '0.75rem';
+        btn.innerText = 'Confirmar orden';
+        btn.onclick = () => {
+            const order = Array.from(wrap.querySelectorAll('.sort-item')).map(d => d.dataset.value);
+            checkSortAnswer(order);
+        };
+        wrap.appendChild(btn);
+    } else if (q.type === 'match') {
+        const dz = document.createElement('div');
+        dz.className = 'drop-zone';
+        dz.innerText = '⬇ SUELTA LA FUNCIÓN AQUÍ';
+        dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+        dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+        dz.addEventListener('drop', e => {
+            e.preventDefault();
+            dz.classList.remove('dragover');
+            checkMatchAnswer(e.dataTransfer.getData('text'));
+        });
+
+        const ic = document.createElement('div');
+        ic.className = 'drag-items';
+        [...q.dragItems].sort(() => Math.random() - 0.5).forEach(item => {
+            const c = document.createElement('div');
+            c.className = 'drag-chip';
+            c.innerText = item;
+            c.draggable = true;
+            c.addEventListener('dragstart', e => e.dataTransfer.setData('text', item));
+            ic.appendChild(c);
+        });
+
+        wrap.appendChild(dz);
+        wrap.appendChild(ic);
+    }
+
+    qContent.appendChild(wrap);
+}
+
+// ─── ANSWER CHECKING ─────────────────────────────────────────────────────────
+function checkAnswer(i) {
+    if (!canAnswer) return;
+    handleResult(i === questions[qIdx].correct);
+}
+function checkSortAnswer(order) {
+    if (!canAnswer) return;
+    handleResult(JSON.stringify(order) === JSON.stringify(questions[qIdx].correct));
+}
+function checkMatchAnswer(val) {
+    if (!canAnswer) return;
+    handleResult(val === questions[qIdx].target);
+}
+
+function handleResult(correct) {
+    clearInterval(timer);
+    canAnswer = false;
+
+    if (correct) {
+        showFeedback(true, '¡CORRECTO! ✓');
+        openScorer();
+    } else {
+        const card = document.getElementById('app');
+        card.classList.add('shake');
+        setTimeout(() => card.classList.remove('shake'), 400);
+        showFeedback(false, 'INCORRECTO — pasa el siguiente voluntario.');
+        isFirstAttempt = false;
+        startAutoRetry();
+    }
+}
+
+function handleTimeout() {
+    canAnswer = false;
+    showFeedback(false, '¡TIEMPO AGOTADO! ⏱ Pasa otro alumno.');
+    isFirstAttempt = false;
+    startAutoRetry();
+}
+
+// ─── FEEDBACK ────────────────────────────────────────────────────────────────
+function showFeedback(ok, msg) {
+    feedbackEl.className = ok ? 'show correct-fb' : 'show wrong-fb';
+    feedbackEl.innerText = msg;
+}
+
+// ─── AUTO RETRY ──────────────────────────────────────────────────────────────
+function startAutoRetry() {
+    retryBtn.classList.remove('hidden');
+    let cd = 3;
+    retryCountdown.innerText = `(${cd}s)`;
+    clearInterval(retryTimer);
+    retryTimer = setInterval(() => {
+        cd--;
+        if (cd <= 0) {
+            clearInterval(retryTimer);
+            retryCountdown.innerText = '';
+            retryBtn.classList.add('hidden');
+            doRetry();
+        } else {
+            retryCountdown.innerText = `(${cd}s)`;
+        }
+    }, 1000);
+}
+
+retryBtn.onclick = () => {
+    clearInterval(retryTimer);
+    retryCountdown.innerText = '';
+    doRetry();
+};
+
+function doRetry() {
+    canAnswer = true;
+    timeLeft = 20;
+    feedbackEl.className = '';
+    feedbackEl.innerHTML = '';
+    retryBtn.classList.add('hidden');
+    teamScorer.classList.remove('show');
+    renderQuestion(questions[qIdx]);
+    startTimer();
+}
+
+// ─── TEAM SCORER ─────────────────────────────────────────────────────────────
+function openScorer() {
+    scorerOpen = true;
+    const pts = isFirstAttempt ? 10 : 5;
+    scorerLabel.innerText = `¿Qué equipo respondió correctamente? (+${pts} pts)`;
+
+    teamBtns.innerHTML = '';
+    teams.forEach(t => {
+        const b = document.createElement('button');
+        b.className = 'team-score-btn';
+        b.style.borderColor = t.color.bg;
+        b.style.color = t.color.bg;
+        b.style.background = 'transparent';
+        b.innerHTML = `<span class="team-dot" style="background:${t.color.bg}"></span> ${t.name}`;
+        b.onclick = () => awardTeam(t.name, pts);
+        teamBtns.appendChild(b);
+    });
+
+    teamScorer.classList.add('show');
+}
+
+function awardTeam(name, pts) {
+    scores[name] += pts;
+    renderLiveScores();
+    showPointToast(`+${pts} pts — ${name}`);
+    teamScorer.classList.remove('show');
+    nextBtn.classList.remove('hidden');
+}
+
+nextBtn.onclick = () => {
+    qIdx++;
+    if (qIdx < questions.length) loadQuestion();
+    else showLeaderboard();
+};
+
+// ─── POINT TOAST ─────────────────────────────────────────────────────────────
+function showPointToast(msg) {
+    const t = document.createElement('div');
+    t.className = 'point-toast';
+    t.innerText = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 1300);
+}
+
+// ─── LEADERBOARD ─────────────────────────────────────────────────────────────
+function showLeaderboard() {
+    const sorted = teams.slice().sort((a, b) => scores[b.name] - scores[a.name]);
+    const max = scores[sorted[0].name] || 1;
+    const medals = ['🥇', '🥈', '🥉'];
+    const rankClasses = ['gold', 'silver', 'bronze'];
+
+    const list = document.getElementById('lb-list');
+    list.innerHTML = '';
+    sorted.forEach((t, i) => {
+        const row = document.createElement('div');
+        row.className = 'lb-row';
+        row.style.animationDelay = `${i * 0.08}s`;
+        row.innerHTML = `
+            <div class="lb-rank ${rankClasses[i] || ''}">${medals[i] || (i + 1)}</div>
+            <div style="display:flex;align-items:center;gap:0.5rem;flex:1;">
+                <span class="team-dot" style="background:${t.color.bg};width:14px;height:14px;"></span>
+                <span class="lb-name">${t.name}</span>
+            </div>
+            <div style="text-align:right;">
+                <div class="lb-score">${scores[t.name]}</div>
+                <div class="lb-pts">puntos</div>
+            </div>
+        `;
+        list.appendChild(row);
+
+        // Animate bar after append
+        setTimeout(() => {
+            const bar = row.querySelector('.lb-bar');
+            if (bar) bar.style.width = `${(scores[t.name] / max) * 100}%`;
+        }, 50 + i * 80);
+    });
+
+    showScreen('lb');
+}
+
+// ─── DRAG & DROP (sort) ───────────────────────────────────────────────────────
+let dragSrc = null;
+function dragStart(e) {
+    if (!canAnswer) return e.preventDefault();
+    dragSrc = this;
+}
+function dragOver(e) { e.preventDefault(); }
+function dragDrop(e) {
+    e.stopPropagation();
+    if (dragSrc && dragSrc !== this) {
+        const all = [...this.parentNode.children];
+        const si = all.indexOf(dragSrc), di = all.indexOf(this);
+        if (si < di) this.parentNode.insertBefore(dragSrc, this.nextSibling);
+        else this.parentNode.insertBefore(dragSrc, this);
+    }
+}
+</script>
+</body>
+</html>
