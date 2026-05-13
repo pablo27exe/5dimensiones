@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Desafío: Niveles Organizacionales</title>
+    <title>Desafío: Rasgos de la Personalidad</title>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -506,12 +506,11 @@
             <div class="card-header">
                 <div>
                     <h1>Comportamiento Organizacional</h1>
-    
+                    <p>Rasgos de la Personalidad</p>
                 </div>
             </div>
             <div class="card-body">
                 <h2 class="reg-title">Registro de <span>Equipos</span></h2>
-
 
                 <div class="input-row">
                     <input type="text" id="team-input" placeholder="Nombre del equipo…" maxlength="30" />
@@ -535,7 +534,7 @@
             <div class="card-header">
                 <div>
                     <h1>Comportamiento Organizacional</h1>
-                    <p>Tema: Los Niveles Jerárquicos</p>
+                    <p>Tema: Rasgos de la Personalidad</p>
                 </div>
             </div>
             <div class="intro-body">
@@ -545,7 +544,6 @@
                     <li>⏱ <span>20s</span> por pregunta antes de que el tiempo expire</li>
                     <li>🥇 Primer intento correcto: <span>10 pts</span></li>
                     <li>🔄 Intentos siguientes: <span>5 pts</span></li>
-                    <li>👆 Selecciona el equipo que respondió bien</li>
                 </ul>
                 <button class="btn btn-accent" style="padding:1rem 2.5rem;font-size:1.05rem;" id="start-btn">
                     ¡COMENZAR!
@@ -561,7 +559,7 @@
             <div class="card-header">
                 <div class="game-meta" style="width:100%;">
                     <div>
-                        <h1 style="font-size:0.85rem;">Niveles Jerárquicos</h1>
+                        <h1 style="font-size:0.85rem;">Rasgos de la Personalidad</h1>
                         <p id="q-counter" class="q-counter" style="color:var(--text);margin-top:2px;">Pregunta 1 / 10</p>
                     </div>
                     <div class="timer-wrap">
@@ -606,7 +604,7 @@
             <div class="card-header">
                 <div>
                     <h1>Comportamiento Organizacional</h1>
-                    <p>Resultados finales</p>
+                    <p>Rasgos de la Personalidad — Resultados finales</p>
                 </div>
             </div>
             <div class="card-body">
@@ -637,16 +635,66 @@ const TEAM_COLORS = [
 
 // ─── QUESTIONS ────────────────────────────────────────────────────────────────
 const questions = [
-    { type:'sort', question:'Ordena la pirámide organizacional desde el nivel más alto al más bajo:', items:['Nivel Estratégico','Nivel Táctico','Nivel Operativo'], correct:['Nivel Estratégico','Nivel Táctico','Nivel Operativo'] },
-    { type:'choice', question:'¿Cuál es el horizonte de tiempo predominante en el Nivel Estratégico?', options:['Corto plazo (meses)','Mediano plazo (1 año)','Largo plazo (3 a 5 años)','Inmediato'], correct:2 },
-    { type:'match', question:'Arrastra la función al Nivel Superior (Estratégico):', dragItems:['Análisis FODA','Supervisión de obreros','Informes de ventas diarios'], target:'Análisis FODA' },
-    { type:'choice', question:'¿Quién actúa como intermediario entre la dirección y el nivel operativo?', options:['Director Ejecutivo','Gerencia de Nivel Medio','Nivel Inferior','Accionistas'], correct:1 },
-    { type:'boolean', question:'¿El modelo burocrático de Max Weber se basa en la diferenciación de poder y jerarquía?', options:['Verdadero','Falso'], correct:0 },
-    { type:'match', question:'Arrastra la función al Nivel Operativo:', dragItems:['Gestión del cambio','Priorizar tareas diarias','Establecer visión 2030'], target:'Priorizar tareas diarias' },
-    { type:'choice', question:'¿Qué nivel se ocupa de la ejecución de procesos y objetivos de corto plazo?', options:['Nivel Táctico','Nivel Estratégico','Nivel Operativo','Nivel Global'], correct:2 },
-    { type:'sort', question:'Ordena estos cargos de mayor a menor autoridad:', items:['Director Ejecutivo','Gerente de Departamento','Supervisor de Turno'], correct:['Director Ejecutivo','Gerente de Departamento','Supervisor de Turno'] },
-    { type:'choice', question:'¿Cuál es una función clave de los ejecutivos de nivel Táctico?', options:['Diseñar la visión de mercado','Operar maquinaria pesada','Definir indicadores de desempeño colectivo','Aceptar críticas de clientes'], correct:2 },
-    { type:'boolean', question:'¿El nivel estratégico se encarga de las actividades cotidianas de la empresa?', options:['Verdadero','Falso'], correct:1 },
+    {
+        type: 'sort',
+        question: 'Ordena los 5 grandes rasgos de personalidad (Big Five) según su orden clásico de enumeración:',
+        items: ['Neuroticismo', 'Extraversión', 'Apertura a la experiencia', 'Amabilidad', 'Responsabilidad'],
+        correct: ['Neuroticismo', 'Extraversión', 'Apertura a la experiencia', 'Amabilidad', 'Responsabilidad']
+    },
+    {
+        type: 'choice',
+        question: '¿Cuál de los siguientes rasgos describe mejor a una persona del temperamento MELANCÓLICO?',
+        options: ['Sociable, alegre y despreocupada', 'Activa, impulsiva y optimista', 'Voluble, ansiosa y pesimista', 'Pacífica, fiable y calmada'],
+        correct: 2
+    },
+    {
+        type: 'match',
+        question: 'Arrastra el rasgo que corresponde al temperamento COLÉRICO:',
+        dragItems: ['Impulsivo', 'Ecuánime', 'Reservado'],
+        target: 'Impulsivo'
+    },
+    {
+        type: 'boolean',
+        question: 'El modelo biopsicosocial plantea que el bienestar del ser humano depende únicamente de su salud física.',
+        options: ['Verdadero', 'Falso'],
+        correct: 1
+    },
+    {
+        type: 'choice',
+        question: '¿Qué dimensión representa la letra "bio" en el término biopsicosocial, según su etimología?',
+        options: ['Mente', 'Sociedad', 'Vida', 'Conducta'],
+        correct: 2
+    },
+    {
+        type: 'match',
+        question: 'Arrastra el rasgo que corresponde al temperamento FLEMÁTICO:',
+        dragItems: ['Inquieto', 'Cuidadoso y pacifico', 'Quisquilloso'],
+        target: 'Cuidadoso y pacifico'
+    },
+    {
+        type: 'choice',
+        question: 'Según el contenido visto, el comportamiento de las personas se basa principalmente en:',
+        options: ['Hechos objetivos y concretos', 'Sus percepciones', 'Decisiones racionales exclusivamente', 'La cultura organizacional'],
+        correct: 1
+    },
+    {
+        type: 'sort',
+        question: 'Ordena los tres factores del modelo biopsicosocial de lo más interno a lo más externo:',
+        items: ['Biológico', 'Psicológico', 'Social'],
+        correct: ['Biológico', 'Psicológico', 'Social']
+    },
+    {
+        type: 'choice',
+        question: '¿Por qué las organizaciones son cautelosas al contratar personas para ciertos puestos?',
+        options: ['Porque priorizan la experiencia técnica sobre todo', 'Porque las personas están en contacto con clientes y proveedores, por lo que deben asumir actitudes y comportamientos deseables', 'Porque el salario depende del temperamento', 'Porque la RAE define estrictamente los perfiles'],
+        correct: 1
+    },
+    {
+        type: 'boolean',
+        question: 'Los factores dinámicos internos son aquellos que imprimen dinamismo a la personalidad, manteniendo activo el procesamiento y registro de información.',
+        options: ['Verdadero', 'Falso'],
+        correct: 0
+    },
 ];
 
 // ─── STATE ────────────────────────────────────────────────────────────────────
